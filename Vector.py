@@ -329,7 +329,6 @@ async def demote(i: discord.Interaction, user: discord.Member):
     await i.response.send_message(f"{user.display_name} has been demoted to {prev_role.name}.", ephemeral=True)
     await log(f"📉 **{i.user}** demoted **{user.display_name}** to **{prev_role.name}**.")
 
-
 @bot.event
 async def on_ready():
     GUILD_ID = 1344086250172317727  # Guild to sync slash commands to
