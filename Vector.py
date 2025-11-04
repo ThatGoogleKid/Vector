@@ -268,9 +268,15 @@ async def promote(i: discord.Interaction, user: discord.Member):
     next_role = guild_roles[current_index + 1]
     await user.add_roles(next_role)
 
-    # Remove previous role if they had one
+    # Remove previous role if applicable — except when going from Member -> Mod
     if current_index >= 0:
-        await user.remove_roles(guild_roles[current_index])
+        current_role = guild_roles[current_index]
+        member_role = i.guild.get_role(config["public_roles"]["member"])
+        mod_role = i.guild.get_role(config["public_roles"]["mod"])
+
+        # Only remove the old role if not transitioning from Member -> Mod
+        if not (current_role == member_role and next_role == mod_role):
+            await user.remove_roles(current_role)
 
     await i.response.send_message(f"{user.display_name} has been promoted to {next_role.name}.", ephemeral=True)
     await log(f"📈 **{i.user}** promoted **{user.display_name}** to **{next_role.name}**.")
