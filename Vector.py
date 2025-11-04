@@ -268,15 +268,20 @@ async def promote(i: discord.Interaction, user: discord.Member):
     next_role = guild_roles[current_index + 1]
     await user.add_roles(next_role)
 
+    # Role references
+    member_role = i.guild.get_role(config["public_roles"]["member"])
+    mod_role = i.guild.get_role(config["public_roles"]["mod"])
+    staff_role = i.guild.get_role(config["public_roles"]["staff"])  # staff role in same guild
+
     # Remove previous role if applicable — except when going from Member -> Mod
     if current_index >= 0:
         current_role = guild_roles[current_index]
-        member_role = i.guild.get_role(config["public_roles"]["member"])
-        mod_role = i.guild.get_role(config["public_roles"]["mod"])
-
-        # Only remove the old role if not transitioning from Member -> Mod
         if not (current_role == member_role and next_role == mod_role):
             await user.remove_roles(current_role)
+
+    # If promoted from Member -> Mod, give Staff role
+    if member_role in user.roles and next_role == mod_role and staff_role:
+        await user.add_roles(staff_role)
 
     await i.response.send_message(f"{user.display_name} has been promoted to {next_role.name}.", ephemeral=True)
     await log(f"📈 **{i.user}** promoted **{user.display_name}** to **{next_role.name}**.")
@@ -308,12 +313,22 @@ async def demote(i: discord.Interaction, user: discord.Member):
     prev_role = guild_roles[current_index - 1]
     await user.add_roles(prev_role)
 
+    # Role references
+    member_role = i.guild.get_role(config["public_roles"]["member"])
+    mod_role = i.guild.get_role(config["public_roles"]["mod"])
+    staff_role = i.guild.get_role(config["public_roles"]["staff"])
+
     # Remove old role
-    if current_index >= 0:
-        await user.remove_roles(guild_roles[current_index])
+    current_role = guild_roles[current_index]
+    await user.remove_roles(current_role)
+
+    # If demoted from Mod -> Member, remove Staff role
+    if current_role == mod_role and prev_role == member_role and staff_role:
+        await user.remove_roles(staff_role)
 
     await i.response.send_message(f"{user.display_name} has been demoted to {prev_role.name}.", ephemeral=True)
     await log(f"📉 **{i.user}** demoted **{user.display_name}** to **{prev_role.name}**.")
+
 
 @bot.event
 async def on_ready():
