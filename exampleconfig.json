@@ -1,0 +1,29 @@
+{
+  "token": "TOKEN",
+
+  "status": "STATUS",
+
+  "public_guild_id": 0,
+
+  "channels": {
+    "ticket_panel": 0,
+    "logs": 0
+  },
+
+  "ticket_categories": {
+    "general_tickets": 0,
+    "staff_store_tickets": 0
+  },
+
+  "public_roles": {
+    "developer": 0,
+    "manager": 0,
+    "owner": 0,
+    "sr_admin": 0,
+    "admin": 0,
+    "sr_mod": 0,
+    "mod": 0,
+    "staff": 0,
+    "member": 0
+  }
+}
