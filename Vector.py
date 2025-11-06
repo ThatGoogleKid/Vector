@@ -7,7 +7,7 @@ intents.messages = True
 intents.guilds = True
 intents.message_content = True
 
-GUILD_ID = config["public_guild_id"]
+GUILD_ID = 1344086250172317727
 GUILD = discord.Object(id=GUILD_ID)
 
 # Load config
@@ -331,8 +331,7 @@ async def demote(i: discord.Interaction, user: discord.Member):
 
 @bot.event
 async def on_ready():
-    GUILD_ID = config["public_guild_id"]
-# Guild to sync slash commands to
+    GUILD_ID = 1344086250172317727  # Guild to sync slash commands to
     guild = discord.Object(id=GUILD_ID)
 
     try:
