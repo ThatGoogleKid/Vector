@@ -60,6 +60,8 @@ class TicketPanel(discord.ui.View):
     async def staff_app(self, i, b): await create_ticket(i, "Staff Applications")
     @discord.ui.button(label="🎥 Media Applications", style=discord.ButtonStyle.green)
     async def media_app(self, i, b): await create_ticket(i, "Media Applications")
+    @discord.ui.button(label="⛔ Private Server Applications", style=discord.ButtonStyle.green)
+    async def private_app(self, i, b): await create_ticket(i, "Private Server Applications")
 
     # Staff / Store Tickets
     @discord.ui.button(label="❗ Report a Staff Member", style=discord.ButtonStyle.red)
@@ -75,7 +77,7 @@ async def create_ticket(interaction, category):
     STAFF_CATEGORY_ID = 1435017525707669535    # Staff Reports / Store Issues category
 
     # Determine which category to place the ticket in
-    if category in ["General Support", "Bug Report", "Player Report", "Staff Applications", "Media Applications"]:
+    if category in ["General Support", "Bug Report", "Player Report", "Staff Applications", "Media Applications", "Private Server Applications"]:
         parent_category = guild.get_channel(GENERAL_CATEGORY_ID)
     elif category in ["Report a Staff Member", "Store Issues"]:
         parent_category = guild.get_channel(STAFF_CATEGORY_ID)
@@ -126,7 +128,7 @@ class TicketButtons(discord.ui.View):
     @discord.ui.button(label="Close Ticket", style=discord.ButtonStyle.red)
     async def close(self, interaction: discord.Interaction, button: discord.ui.Button):
         # Roles allowed to close
-        allowed_roles = ["manager", "admin", "sr_admin", "owner"]
+        allowed_roles = ["manager", "admin", "sr_admin", "sr_mod", "owner"]
         user_roles = [r.id for r in interaction.user.roles]
         allowed = False
         for role_key in allowed_roles:
@@ -360,3 +362,4 @@ async def on_ready():
     print(f"Bot online as {bot.user}")
 
 bot.run(TOKEN)
+
