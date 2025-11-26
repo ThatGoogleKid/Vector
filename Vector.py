@@ -55,15 +55,14 @@ class TicketPanel(discord.ui.View):
     async def bug_report(self, i, b): await create_ticket(i, "Bug Report")
     @discord.ui.button(label="🔪 Player Report", style=discord.ButtonStyle.green)
     async def player_report(self, i, b): await create_ticket(i, "Player Report")
-    @discord.ui.button(label="👮‍♂️ Staff Applications", style=discord.ButtonStyle.green)
-    async def staff_app(self, i, b): await create_ticket(i, "Staff Applications")
     @discord.ui.button(label="🎥 Media Applications", style=discord.ButtonStyle.green)
     async def media_app(self, i, b): await create_ticket(i, "Media Applications")
 
     # Staff / Store Tickets
+    @discord.ui.button(label="👮‍♂️ Staff Applications", style=discord.ButtonStyle.green)
+    async def staff_app(self, i, b): await create_ticket(i, "Staff Applications")
     @discord.ui.button(label="🔨 Appeal a Punishment", style=discord.ButtonStyle.red)
     async def appeal_punishment(self, i, b): await create_ticket(i, "Appeals") 
-    
     @discord.ui.button(label="❗ Report a Staff Member", style=discord.ButtonStyle.red)
     async def staff_report(self, i, b): await create_ticket(i, "Report a Staff Member")
     @discord.ui.button(label="🛒 Store Issues", style=discord.ButtonStyle.red)
@@ -78,9 +77,9 @@ async def create_ticket(interaction, category):
 
     # 1. Determine which category to place the ticket in AND its sensitivity
     is_sensitive = False
-    if category in ["General Support", "Bug Report", "Player Report", "Staff Applications", "Media Applications"]:
+    if category in ["General Support", "Bug Report", "Player Report", "Media Applications"]:
         parent_category = guild.get_channel(GENERAL_CATEGORY_ID)
-    elif category in ["Report a Staff Member", "Store Issues", "Appeals"]:
+    elif category in ["Report a Staff Member", "Store Issues", "Appeals", "Staff Applications"]:
         parent_category = guild.get_channel(STAFF_CATEGORY_ID)
         is_sensitive = True
     else:
@@ -98,17 +97,9 @@ async def create_ticket(interaction, category):
     if not is_sensitive and staff_role:
         overwrites[staff_role] = discord.PermissionOverwrite(view_channel=True, send_messages=True)
     
-    # 3. Restricted/High-level tickets: Layer on specific permissions
-    
-    # Bug Reports and General tickets still get high-level roles layered on top
-    if category == "Bug Report":
-        # Only Developers, Managers, and Owners can see Bug Reports
-        for role_key in ["developer","manager","owner"]:
-            role = guild.get_role(config["public_roles"].get(role_key))
-            if role: overwrites[role] = discord.PermissionOverwrite(view_channel=True, send_messages=True)
             
     # Staff/Store Tickets: Only Sr Admin+ can see these (Crucial for restriction)
-    elif category in ["Report a Staff Member","Store Issues", "Appeals"]:
+    elif category in ["Report a Staff Member","Store Issues", "Appeals", "Staff Applications"]:
         for role_key in ["sr_admin","manager","owner"]:
             role = guild.get_role(config["public_roles"].get(role_key))
             if role: overwrites[role] = discord.PermissionOverwrite(view_channel=True, send_messages=True)
