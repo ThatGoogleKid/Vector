@@ -59,7 +59,7 @@ class TicketPanel(discord.ui.View):
     async def media_app(self, i, b): await create_ticket(i, "Media Applications")
 
     # Staff / Store Tickets
-    @discord.ui.button(label="👮‍♂️ Staff Applications", style=discord.ButtonStyle.green)
+    @discord.ui.button(label="👮‍♂️ Staff Applications", style=discord.ButtonStyle.red)
     async def staff_app(self, i, b): await create_ticket(i, "Staff Applications")
     @discord.ui.button(label="🔨 Appeal a Punishment", style=discord.ButtonStyle.red)
     async def appeal_punishment(self, i, b): await create_ticket(i, "Appeals") 
@@ -429,3 +429,4 @@ async def on_ready():
     print(f"Bot online as {bot.user}")
 
 bot.run(TOKEN)
+
