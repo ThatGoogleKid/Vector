@@ -100,7 +100,7 @@ async def create_ticket(interaction, category):
             
     # Staff/Store Tickets: Only Sr Admin+ can see these (Crucial for restriction)
     elif category in ["Report a Staff Member","Store Issues", "Appeals", "Staff Applications"]:
-        for role_key in ["sr_admin","manager","owner"]:
+        for role_key in ["admin","sr_admin","manager","owner"]:
             role = guild.get_role(config["public_roles"].get(role_key))
             if role: overwrites[role] = discord.PermissionOverwrite(view_channel=True, send_messages=True)
 
@@ -429,4 +429,3 @@ async def on_ready():
     print(f"Bot online as {bot.user}")
 
 bot.run(TOKEN)
-
