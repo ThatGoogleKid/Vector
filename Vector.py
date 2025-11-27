@@ -398,6 +398,70 @@ async def demote(i: discord.Interaction, user: discord.Member):
     await i.response.send_message(f"{user.display_name} has been demoted to {prev_role.name}.", ephemeral=True)
     await log(f"📉 **{i.user}** demoted **{user.display_name}** to **{prev_role.name}**.")
 
+@bot.tree.command(name="sendembed", description="Sends a custom embed into the channel.", guild=GUILD)
+@app_commands.describe(
+    title="The title of the embed.",
+    message="The main message/description of the embed. Use '||' for a new line.",
+    hex_color="The embed color in hex format (e.g., FF0000 for red). (Optional)"
+)
+async def sendembed(i: discord.Interaction, title: str, message: str, hex_color: str = None):
+    # Check if user has Owner or Manager permission
+    allowed_roles = [
+        config["public_roles"]["manager"],
+        config["public_roles"]["owner"]
+    ]
+    
+    if not any(i.guild.get_role(rid) in i.user.roles for rid in allowed_roles):
+        return await i.response.send_message("You do not have permission to use this command.", ephemeral=True)
+
+    # 1. Process Message and Color
+    processed_message = message.replace("||", "\n")
+    
+    embed_color = 0x00AAEE  # Default color if no hex_color is provided or if conversion fails
+
+    if hex_color:
+        # Clean the input (remove potential starting #)
+        hex_color = hex_color.lstrip('#')
+        
+        # Validate and convert the hex string to an integer
+        if len(hex_color) == 6:
+            try:
+                # Convert the base-16 (hex) string to an integer
+                embed_color = int(hex_color, 16)
+            except ValueError:
+                # Send a warning but proceed with the default color
+                await i.response.send_message(
+                    "⚠️ Invalid hex color provided. Using default blue color.", 
+                    ephemeral=True
+                )
+                # We return here to avoid double-responding if the exception occurred before the initial response
+                # But since we need to send the embed, we'll use followup for the warning
+                await i.channel.send(f"⚠️ Staff warning: The hex color '{hex_color}' was invalid. Using default color.", delete_after=10)
+        else:
+            await i.channel.send(f"⚠️ Staff warning: Hex color must be exactly 6 characters. Using default color.", delete_after=10)
+
+
+    # 2. Construct the Embed
+    embed = discord.Embed(
+        title=title,
+        description=processed_message,
+        color=embed_color # Use the processed color
+    )
+    
+    # 3. Send Response and Embed
+    # Acknowledge the interaction first (it might have been sent as a warning above)
+    try:
+        await i.response.send_message("Sending embed...", ephemeral=True)
+        # Send the embed publicly
+        await i.channel.send(embed=embed)
+        await i.followup.send("Embed successfully sent!", ephemeral=True)
+    except discord.InteractionResponded:
+        # If the warning was sent as the initial response, just send the embed
+        await i.channel.send(embed=embed)
+        await i.followup.send("Embed successfully sent!", ephemeral=True)
+
+
+
 @bot.event
 async def on_ready():
     GUILD_ID = config["public_guild_id"]  # Guild to sync slash commands to
