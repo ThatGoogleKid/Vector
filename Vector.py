@@ -148,7 +148,7 @@ class TicketButtons(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @discord.ui.button(label="Close Ticket", style=discord.ButtonStyle.red)
+    @discord.ui.button(label="Close Ticket", style=discord.ButtonStyle.red, custom_id="ticket_close")
     async def close(self, interaction: discord.Interaction, button: discord.ui.Button):
         # Roles allowed to close (Permission check for INITIATING closure)
         allowed_roles = ["manager", "admin", "sr_admin", "owner", "sr_mod", "mod"]
@@ -464,6 +464,11 @@ async def sendembed(i: discord.Interaction, title: str, message: str, hex_color:
 
 @bot.event
 async def on_ready():
+    # Register persistent views 
+    if not hasattr(bot, "persistent_views_added"):
+        bot.add_view(TicketButtons())
+        bot.persistent_views_added = True
+
     GUILD_ID = config["public_guild_id"]  # Guild to sync slash commands to
     guild = discord.Object(id=GUILD_ID)
 
